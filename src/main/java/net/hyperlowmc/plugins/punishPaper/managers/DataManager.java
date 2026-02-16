@@ -140,7 +140,20 @@ public class DataManager {
     }
 
     public Punishment getPunishmentById(String banId) {
-        return punishmentsById.get(banId);
+        // Try exact match first
+        Punishment punishment = punishmentsById.get(banId);
+        if (punishment != null) {
+            return punishment;
+        }
+
+        // Try case-insensitive search
+        for (Map.Entry<String, Punishment> entry : punishmentsById.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(banId)) {
+                return entry.getValue();
+            }
+        }
+
+        return null;
     }
 
     public PlayerData getOrCreatePlayerData(UUID uuid, String name) {

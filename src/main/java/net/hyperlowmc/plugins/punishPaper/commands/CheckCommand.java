@@ -35,7 +35,7 @@ public class CheckCommand implements CommandExecutor, TabCompleter {
 
         String query = args[0].replace("#", "");
 
-        // Check if it's a ban ID
+        // Check if it's a ban ID (case-insensitive)
         Punishment punishment = plugin.getDataManager().getPunishmentById(query);
         if (punishment != null) {
             // If sender is player and no "forgive" argument, open GUI
@@ -47,8 +47,8 @@ public class CheckCommand implements CommandExecutor, TabCompleter {
                 // Handle forgive
                 if (args.length > 1 && args[1].equalsIgnoreCase("forgive")) {
                     if (sender.hasPermission("punishments.forgive")) {
-                        plugin.getPunishmentManager().forgivePunishment(query);
-                        sender.sendMessage(ChatColor.GREEN + "Forgiven punishment #" + query);
+                        plugin.getPunishmentManager().forgivePunishment(punishment.getBanId());
+                        sender.sendMessage(ChatColor.GREEN + "Forgiven punishment #" + punishment.getBanId());
                     } else {
                         sender.sendMessage(ChatColor.RED + "No permission to forgive!");
                     }
@@ -81,6 +81,7 @@ public class CheckCommand implements CommandExecutor, TabCompleter {
         }
 
         sender.sendMessage(ChatColor.RED + "Punishment or player not found!");
+        sender.sendMessage(ChatColor.GRAY + "Tip: Ban IDs are case-sensitive. Make sure O and 0 (zero) are correct.");
         return true;
     }
 
@@ -103,6 +104,7 @@ public class CheckCommand implements CommandExecutor, TabCompleter {
                 (punishment.getCategory() != null ? punishment.getCategory() : "Manual"));
         sender.sendMessage(ChatColor.YELLOW + "Punished by: " + ChatColor.WHITE + punishment.getPunishedBy());
         sender.sendMessage(ChatColor.YELLOW + "Active: " + ChatColor.WHITE + punishment.isActive());
+        sender.sendMessage(ChatColor.YELLOW + "IP Address: " + ChatColor.WHITE + punishment.getIpAddress());
 
         if (punishment.getDuration() == -1) {
             sender.sendMessage(ChatColor.YELLOW + "Duration: " + ChatColor.WHITE + "Permanent");
@@ -122,14 +124,29 @@ public class CheckCommand implements CommandExecutor, TabCompleter {
         }
 
         sender.sendMessage(ChatColor.GOLD + "=== " + name + "'s Punishment History ===");
+        sender.sendMessage(ChatColor.YELLOW + "UUID: " + ChatColor.WHITE + uuid);
+        sender.sendMessage(ChatColor.YELLOW + "Known IPs: " + ChatColor.WHITE + data.getIpAddresses().size());
         sender.sendMessage(ChatColor.YELLOW + "Total punishments: " + ChatColor.WHITE + data.getPunishments().size());
+        sender.sendMessage("");
 
         List<Punishment> punishments = data.getPunishments();
-        for (int i = Math.max(0, punishments.size() - 5); i < punishments.size(); i++) {
+        int startIndex = Math.max(0, punishments.size() - 10); // Show last 10
+        for (int i = startIndex; i < punishments.size(); i++) {
             Punishment p = punishments.get(i);
             String status = p.isActive() ? ChatColor.RED + "[ACTIVE]" : ChatColor.GRAY + "[INACTIVE]";
-            sender.sendMessage(status + ChatColor.WHITE + " #" + p.getBanId() + " - " +
-                    p.getType() + " - " + p.getReason());
+            String typeColor = "";
+            switch (p.getType()) {
+                case BAN: typeColor = ChatColor.DARK_RED.toString(); break;
+                case MUTE: typeColor = ChatColor.GOLD.toString(); break;
+                case KICK: typeColor = ChatColor.YELLOW.toString(); break;
+            }
+            sender.sendMessage(status + ChatColor.WHITE + " #" + ChatColor.AQUA + p.getBanId() +
+                    ChatColor.GRAY + " - " + typeColor + p.getType() + ChatColor.GRAY + " - " +
+                    ChatColor.WHITE + p.getReason());
+        }
+
+        if (punishments.size() > 10) {
+            sender.sendMessage(ChatColor.GRAY + "... and " + (punishments.size() - 10) + " more");
         }
     }
 
@@ -145,11 +162,14 @@ public class CheckCommand implements CommandExecutor, TabCompleter {
                     .filter(name -> name.toLowerCase().startsWith(search))
                     .collect(Collectors.toList());
 
-            // Also suggest offline players from stored data
+            // Also suggest offline players from stored data (limit to 10)
+            int count = 0;
             for (PlayerData data : plugin.getDataManager().getAllPlayerData()) {
                 String name = data.getLastKnownName();
                 if (name.toLowerCase().startsWith(search) && !suggestions.contains(name)) {
                     suggestions.add(name);
+                    count++;
+                    if (count >= 10) break; // Limit suggestions
                 }
             }
         } else if (args.length == 2) {
