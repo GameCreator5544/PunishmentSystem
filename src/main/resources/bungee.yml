@@ -1,0 +1,4 @@
+name: HyperLowMC-Punish
+version: 1.0.0
+main: net.hyperlowmc.plugins.punish.Punish
+author: HyperLowMC
