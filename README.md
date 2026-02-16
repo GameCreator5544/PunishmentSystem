@@ -107,6 +107,8 @@ KICK
 
 </details>
 
+## Miscellaneous
+
 You are able to view the paper code in the paper branch.
 
 ### Icon
