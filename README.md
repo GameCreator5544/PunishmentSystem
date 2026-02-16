@@ -11,6 +11,7 @@ An easy to use punishment system.
 - Punishments go IP wide
 - /checkip <ip|player> to check all accounts with one IP
 - Also a unban command as an alias for /check forgive (only for bans)
+- Additionally there is the command /manualpunish to manually punish people while igonring the presets
 
 ---
 
