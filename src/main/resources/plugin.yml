@@ -1,0 +1,42 @@
+name: HyperLowMC-Punish-Paper
+version: 1.0.0
+main: net.hyperlowmc.plugins.punishPaper.PunishPaper
+api-version: '1.20'
+author: HyperLowMC
+
+commands:
+  punish:
+    description: Punish a player
+    usage: /punish <player> <category>
+    permission: punishments.*
+  unban:
+    description: Unban a player
+    usage: /unban <ban-id>
+    permission: punishments.unban
+  check:
+    description: Check punishment history
+    usage: /check <ban-id|player>
+    permission: punishments.check
+  manualpunish:
+    description: Manually punish a player
+    usage: /manualpunish <ban|kick|mute> <player> <reason> [duration]
+    permission: punishments.manual
+  checkip:
+    description: Check IP addresses and alts
+    usage: /checkip <ip|player>
+    permission: punishments.checkip
+
+permissions:
+  punishments.*:
+    description: Access to all punishment commands
+    default: op
+    children:
+      punishments.punish.*: true
+      punishments.unban: true
+      punishments.check: true
+      punishments.forgive: true
+      punishments.manual: true
+      punishments.checkip: true
+  punishments.punish.*:
+    description: Punish with any category
+    default: op
