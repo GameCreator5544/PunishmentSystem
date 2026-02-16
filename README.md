@@ -107,4 +107,8 @@ KICK
 
 </details>
 
+You are able to view the paper code in the paper branch.
 
+### Icon
+
+Judge hammer by ProSymbols from <a href="https://thenounproject.com/browse/icons/term/judge-hammer/" target="_blank" title="Judge hammer Icons">Noun Project</a> (CC BY 3.0)
